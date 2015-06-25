@@ -162,6 +162,11 @@ describe DelayedCronJob do
 
       worker.work_off
     end 
+
+    it 'does not crash if payload object raises error' do
+      allow_any_instance_of(Delayed::Job).to receive(:payload_object).and_raise(Delayed::DeserializationError)
+      expect { Delayed::Job.enqueue(handler, cron: :cron_method) }.not_to raise_error
+    end
   end
 
   context 'without cron' do

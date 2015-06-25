@@ -3,7 +3,13 @@ module DelayedCronJob
 
     class << self
       def next_run_at(job)
-        cron = job.payload_object.respond_to?(job.cron) ? job.payload_object.send(job.cron, job) : job.cron
+        cron = nil
+        begin
+          cron = job.payload_object.respond_to?(job.cron) ? job.payload_object.send(job.cron, job) : job.cron
+        rescue
+          # Do not raise deserialization error
+        end
+
         if cron.nil?
           job.cron = nil
         else
